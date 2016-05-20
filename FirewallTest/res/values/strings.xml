@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <string name="app_name">FirewallTest</string>
+    <string name="action_settings">Settings</string>
+    <string name="hello_world">Hello world!</string>
+    <string name="title_activity_total_data">TotalDataActivity</string>
+    <string name="title_activity_item_data">ItemDataActivity</string>
+    <string name="toast_bin_installed">FirewallTest: Binary files installed!</string>
+    <string name="title_activity_secret">SecretActivity</string>
+
+</resources>
