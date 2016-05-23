@@ -8,5 +8,6 @@
     <string name="title_activity_item_data">ItemDataActivity</string>
     <string name="toast_bin_installed">FirewallTest: Binary files installed!</string>
     <string name="title_activity_secret">SecretActivity</string>
+    <string name="title_activity_gallery">GalleryActivity</string>
 
 </resources>

@@ -89,7 +89,7 @@ public class ItemDataActivity extends Activity {
 
 				final SharedPreferences prefs = getSharedPreferences(
 						PREFS_NAME, 0);
-				// allowed application names separated by pipe '|' (persisted)
+				//将各个应用的网络连接设置按照Uid存储到SharedPreferences中
 
 				String Uids_gprs = prefs.getString(appid + "gprs", "false");
 				String Uids_wifi = prefs.getString(appid + "wifi", "false");

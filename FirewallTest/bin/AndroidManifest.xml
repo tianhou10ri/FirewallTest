@@ -34,6 +34,10 @@
             android:name=".SecretActivity"
             android:label="@string/title_activity_secret" >
         </activity>
+        <activity
+            android:name=".GalleryActivity"
+            android:label="@string/title_activity_gallery" >
+        </activity>
     </application>
 
 </manifest>
