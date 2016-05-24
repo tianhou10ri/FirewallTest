@@ -63,7 +63,7 @@ public final class MyApi{
 			"	fi\n" +
 			"	# Grep is absolutely required\n" +
 			"	if ! $ECHO 1 | $GREP -q 1 >/dev/null 2>/dev/null ; then\n" +
-			"		$ECHO The grep command is required. Firewall will not work.\n" +
+			"		$ECHO The grep command is required. FirewallTest will not work.\n" +
 			"		exit 1\n" +
 			"	fi\n" +
 			"fi\n" +
@@ -93,8 +93,9 @@ public final class MyApi{
 		final String ITFS_WIFI[] = {"tiwlan+", "wlan+", "eth+"};
 		final String ITFS_3G[] = {"rmnet+","pdp+","ppp+","uwbr+"};
 		final SharedPreferences prefs = ctx.getSharedPreferences(PREFS_NAME, 0);
-		
-
+		final boolean whitelist = false;
+		final boolean blacklist = !whitelist;
+		final boolean logenabled = false;
 
     	final StringBuilder script = new StringBuilder();
 		try {
@@ -102,63 +103,96 @@ public final class MyApi{
 			script.append(scriptHeader(ctx));
 			script.append("" +
 				"$IPTABLES --version || exit 1\n" +
-				"# Create the firewfirechains if necessary\n" +
-				"$IPTABLES -L firedwall >/dev/null 2>/dev/null || $IPTABLES --new firewall || exit 2\n" +
-				"$IPTABLES -L firedwall-3g >/dev/null 2>/dev/null || $IPTABLES --new firewall-3g || exit 3\n" +
-				"$IPTABLES -L firedwall-wifi >/dev/null 2>/dev/null || $IPTABLES --new firewall-wifi || exit 4\n" +
-				"$IPTABLES -L firewall-reject >/dev/null 2>/dev/null || $IPTABLES --new firewall-reject || exit 5\n" +
-				"# Add firewall chain to OUTPUT chain if necessary\n" +
-				"$IPTABLES -L OUTPUT | $GREP -q firewall || $IPTABLES -A OUTPUT -j firewall || exit 6\n" +
+				"# Create the droidwall chains if necessary\n" +
+				"$IPTABLES -L droidwall >/dev/null 2>/dev/null || $IPTABLES --new droidwall || exit 2\n" +
+				"$IPTABLES -L droidwall-3g >/dev/null 2>/dev/null || $IPTABLES --new droidwall-3g || exit 3\n" +
+				"$IPTABLES -L droidwall-wifi >/dev/null 2>/dev/null || $IPTABLES --new droidwall-wifi || exit 4\n" +
+				"$IPTABLES -L droidwall-reject >/dev/null 2>/dev/null || $IPTABLES --new droidwall-reject || exit 5\n" +
+				"# Add droidwall chain to OUTPUT chain if necessary\n" +
+				"$IPTABLES -L OUTPUT | $GREP -q droidwall || $IPTABLES -A OUTPUT -j droidwall || exit 6\n" +
 				"# Flush existing rules\n" +
-				"$IPTABLES -F firewall || exit 7\n" +
-				"$IPTABLES -F firewall-3g || exit 8\n" +
-				"$IPTABLES -F firewall-wifi || exit 9\n" +
-				"$IPTABLES -F firewall-reject || exit 10\n" +
+				"$IPTABLES -F droidwall || exit 7\n" +
+				"$IPTABLES -F droidwall-3g || exit 8\n" +
+				"$IPTABLES -F droidwall-wifi || exit 9\n" +
+				"$IPTABLES -F droidwall-reject || exit 10\n" +
 			"");
-			
-			
-			
+			// Check if logging is enabled
+			if (logenabled) {
+				script.append("" +
+					"# Create the log and reject rules (ignore errors on the LOG target just in case it is not available)\n" +
+					"$IPTABLES -A droidwall-reject -j LOG --log-prefix \"[DROIDWALL] \" --log-uid\n" +
+					"$IPTABLES -A droidwall-reject -j REJECT || exit 11\n" +
+				"");
+			} else {
+				script.append("" +
+					"# Create the reject rule (log disabled)\n" +
+					"$IPTABLES -A droidwall-reject -j REJECT || exit 11\n" +
+				"");
+			}
+			if (whitelist && logenabled) {
+				script.append("# Allow DNS lookups on white-list for a better logging (ignore errors)\n");
+				script.append("$IPTABLES -A droidwall -p udp --dport 53 -j RETURN\n");
+			}
 			script.append("# Main rules (per interface)\n");
 			for (final String itf : ITFS_3G) {
-				script.append("$IPTABLES -A firewall -o ").append(itf).append(" -j firewall-3g || exit\n");
+				script.append("$IPTABLES -A droidwall -o ").append(itf).append(" -j droidwall-3g || exit\n");
 			}
 			for (final String itf : ITFS_WIFI) {
-				script.append("$IPTABLES -A firewall -o ").append(itf).append(" -j firewall-wifi || exit\n");
+				script.append("$IPTABLES -A droidwall -o ").append(itf).append(" -j droidwall-wifi || exit\n");
 			}
 			
 			script.append("# Filtering rules\n");
-			
+			final String targetRule = (whitelist ? "RETURN" : "droidwall-reject");
 			final boolean any_3g = uids3g.indexOf(SPECIAL_UID_ANY) >= 0;
 			final boolean any_wifi = uidsWifi.indexOf(SPECIAL_UID_ANY) >= 0;
-			final String targetRule ="firewall-reject";
+			if (whitelist && !any_wifi) {
+				// When "white listing" wifi, we need to ensure that the dhcp and wifi users are allowed
+				int uid = android.os.Process.getUidForName("dhcp");
+				if (uid != -1) {
+					script.append("# dhcp user\n");
+					script.append("$IPTABLES -A droidwall-wifi -m owner --uid-owner ").append(uid).append(" -j RETURN || exit\n");
+				}
+				uid = android.os.Process.getUidForName("wifi");
+				if (uid != -1) {
+					script.append("# wifi user\n");
+					script.append("$IPTABLES -A droidwall-wifi -m owner --uid-owner ").append(uid).append(" -j RETURN || exit\n");
+				}
+			}
 			if (any_3g) {
-				
+				if (blacklist) {
 					/* block any application on this interface */
-					script.append("$IPTABLES -A firewall-3g -j ").append(targetRule).append(" || exit\n");
-				
+					script.append("$IPTABLES -A droidwall-3g -j ").append(targetRule).append(" || exit\n");
+				}
 			} else {
 				/* release/block individual applications on this interface */
 				for (final Integer uid : uids3g) {
-					script.append("$IPTABLES -A firewall-3g -m owner --uid-owner ").append(uid).append(" -j ").append(targetRule).append(" || exit\n");
+					script.append("$IPTABLES -A droidwall-3g -m owner --uid-owner ").append(uid).append(" -j ").append(targetRule).append(" || exit\n");
 				}
 			}
 			if (any_wifi) {
-				
+				if (blacklist) {
 					/* block any application on this interface */
-					script.append("$IPTABLES -A firewall-wifi -j ").append(targetRule).append(" || exit\n");
-				
+					script.append("$IPTABLES -A droidwall-wifi -j ").append(targetRule).append(" || exit\n");
+				}
 			} else {
 				/* release/block individual applications on this interface */
 				for (final Integer uid : uidsWifi) {
-					script.append("$IPTABLES -A firewall-wifi -m owner --uid-owner ").append(uid).append(" -j ").append(targetRule).append(" || exit\n");
+					script.append("$IPTABLES -A droidwall-wifi -m owner --uid-owner ").append(uid).append(" -j ").append(targetRule).append(" || exit\n");
 				}
 			}
-			
+			if (whitelist) {
+				if (!any_3g) {
+					script.append("$IPTABLES -A droidwall-3g -j droidwall-reject || exit\n");
+				}
+				if (!any_wifi) {
+					script.append("$IPTABLES -A droidwall-wifi -j droidwall-reject || exit\n");
+				}
+			}
 	    	final StringBuilder res = new StringBuilder();
 			code = runScriptAsRoot(ctx, script.toString(), res);
 			if (showErrors && code != 0) {
 				String msg = res.toString();
-				Log.e("fireWall", msg);
+				Log.e("DroidWall", msg);
 				// Remove unnecessary help message from output
 				if (msg.indexOf("\nTry `iptables -h' or 'iptables --help' for more information.") != -1) {
 					msg = msg.replace("\nTry `iptables -h' or 'iptables --help' for more information.", "");
@@ -172,6 +206,34 @@ public final class MyApi{
 		}
 		return false;
     }
+	
+	
+	/**
+     * Purge all iptables rules.
+     * @param ctx mandatory context
+     * @param showErrors indicates if errors should be alerted
+     * @return true if the rules were purged
+     */
+	public static boolean purgeIptables(Context ctx, boolean showErrors) {
+    	StringBuilder res = new StringBuilder();
+		try {
+			assertBinaries(ctx, showErrors);
+			int code = runScriptAsRoot(ctx, scriptHeader(ctx) +
+					"$IPTABLES -F droidwall\n" +
+					"$IPTABLES -F droidwall-reject\n" +
+					"$IPTABLES -F droidwall-3g\n" +
+					"$IPTABLES -F droidwall-wifi\n", res);
+			if (code == -1) {
+				if (showErrors) alert(ctx, "error purging iptables. exit code: " + code + "\n" + res);
+				return false;
+			}
+			return true;
+		} catch (Exception e) {
+			if (showErrors) alert(ctx, "error purging iptables: " + e);
+			return false;
+		}
+    }
+	
 	
 	/**
      * Purge and re-add all saved rules (not in-memory ones).
@@ -198,10 +260,10 @@ public final class MyApi{
 				int appid = p.applicationInfo.uid;
 				String Uids_gprs = prefs.getString(appid + "gprs", "false");
 				String Uids_wifi = prefs.getString(appid + "wifi", "false");
-				if(Uids_gprs.equals("ture")){
+				if(Uids_gprs.equals("true")){
 					uids_gprs.add(appid);
 				}
-				if(Uids_wifi.equals("ture")){
+				if(Uids_wifi.equals("true")){
 					uids_wifi.add(appid);
 				}
 				
@@ -253,8 +315,8 @@ public final class MyApi{
 		}
 		if (showErrors) {
 			alert(ctx, "Could not acquire root access.\n" +
-				"You need a rooted phone to run fireWall.\n\n" +
-				"If this phone is already rooted, please make sure fireWall has enough permissions to execute the \"su\" command.\n" +
+				"You need a rooted phone to run FirewallTest.\n\n" +
+				"If this phone is already rooted, please make sure FirewallTest has enough permissions to execute the \"su\" command.\n" +
 				"Error message: " + res.toString());
 		}
 		return false;
