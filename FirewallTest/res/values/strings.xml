@@ -9,5 +9,7 @@
     <string name="toast_bin_installed">FirewallTest: Binary files installed!</string>
     <string name="title_activity_secret">SecretActivity</string>
     <string name="title_activity_gallery">GalleryActivity</string>
+    <string name="title_activity_secret_camera">SecretCameraActivity</string>
+    <string name="title_activity_virus_scan">VirusScanActivity</string>
 
 </resources>

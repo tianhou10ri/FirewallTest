@@ -8,6 +8,14 @@
         android:minSdkVersion="8"
         android:targetSdkVersion="17" />
 
+    <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
+    <uses-permission android:name="android.permission.ACCESS_WIFI_STATE" />
+    <!-- 在SDCard中创建与删除文件权限 -->
+    <uses-permission android:name="android.permission.MOUNT_UNMOUNT_FILESYSTEMS" />
+    <!-- 往SDCard写入数据权限 -->
+    <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
+    <uses-permission android:name="android.permission.CAMERA" />
+
     <application
         android:allowBackup="true"
         android:icon="@drawable/ic_launcher"
@@ -37,6 +45,45 @@
         <activity
             android:name=".GalleryActivity"
             android:label="@string/title_activity_gallery" >
+        </activity>
+        <activity
+            android:name="com.android.photostore.Gallery"
+            android:theme="@android:style/Theme.NoTitleBar.Fullscreen" />
+        <activity
+            android:name="com.android.photostore.GridImageView"
+            android:theme="@android:style/Theme.NoTitleBar.Fullscreen" />
+        <activity
+            android:name="com.android.photostore.ImageSwitcher"
+            android:clearTaskOnLaunch="true"
+            android:configChanges="keyboardHidden|orientation"
+            android:label="@string/app_name"
+            android:noHistory="false"
+            android:stateNotNeeded="true"
+            android:theme="@android:style/Theme.NoTitleBar.Fullscreen" >
+            <intent-filter>
+                <action android:name="android.intent.action.VIEW" />
+
+                <category android:name="android.intent.category.DEFAULT" />
+
+                <data android:mimeType="image/*" />
+            </intent-filter>
+        </activity>
+
+        <receiver android:name=".MyReceiver" >
+            <intent-filter>
+                <action android:name="android.intent.action.ACTION_SHUTDOWN" />
+                <action android:name="android.intent.action.DATE_CHANGED" />
+            </intent-filter>
+        </receiver>
+
+        <activity
+            android:name=".SecretCameraActivity"
+            android:label="@string/title_activity_secret_camera"
+            android:screenOrientation="portrait" >
+        </activity>
+        <activity
+            android:name="com.android.virus.VirusScanActivity"
+            android:label="@string/title_activity_virus_scan" >
         </activity>
     </application>
 

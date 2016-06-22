@@ -139,7 +139,7 @@ public class ItemDataActivity extends Activity {
 		public View getView(int position, View convertView, ViewGroup parent) {
 			final Datalist data = new Datalist();
 			convertView = LayoutInflater.from(context).inflate(
-					R.layout.list_item, null);
+					R.layout.list_app_item, null);
 
 			data.appname = (TextView) convertView
 					.findViewById(R.id.item_name_textView);
