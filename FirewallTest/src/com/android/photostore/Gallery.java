@@ -46,7 +46,7 @@ public class Gallery extends Activity {
 		@Override
 		public void run() {
 
-			getFiles(mCardPath);
+			getFiles(mCardPath+ File.separator + "DrawEncode");
 		}
 	}
 
@@ -122,7 +122,7 @@ public class Gallery extends Activity {
 
 						// ifi.filePathes.add(ff.getPath());
 						// }
-						if (end.equals("DES")) {
+						if (end.equals("JPG")) {
 							String decodepath = code.decode(ff.getPath());
 							ifi.filePathes.add(decodepath);
 						}
@@ -148,7 +148,7 @@ public class Gallery extends Activity {
 	public boolean onKeyDown(int keyCode, KeyEvent event) {
 		if (KeyEvent.KEYCODE_BACK == keyCode) {
 			// °´·µ»Ø¼üÉ¾³ý½âÑ¹ºóÍ¼Æ¬
-			deletEncodeFiles(mCardPath);
+			deletEncodeFiles(mCardPath+ File.separator + "DrawDecode");
 
 		}
 		finish();
@@ -168,8 +168,10 @@ public class Gallery extends Activity {
 				} else {
 					String fName = ff.getName();
 					if (fName.indexOf(".") > -1) {
-						String des = fName.substring(0, 6);
-						if (des.equals("decode")) {
+						String des = fName.substring(
+								fName.lastIndexOf(".") + 1, fName.length())
+								.toUpperCase();
+						if (des.equals("JPG")) {
 							ff.delete();
 
 						}

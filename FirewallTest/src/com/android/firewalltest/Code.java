@@ -27,6 +27,7 @@ public class Code {
 
 	String SDPath = Environment.getExternalStorageDirectory().getPath();
 	String KEY = "12345678";
+	final int TOP=0;
 
 	/*
 	 * 加密文件
@@ -38,11 +39,9 @@ public class Code {
 		if (!dir.exists()) {
 			dir.mkdirs();
 		}
-		
-		String random = new Random().nextLong()+"";
 
 		File fileTemp = new File(srcPath);
-		File filecodeTemp = new File(dir, getnamelimit(fileTemp.getName())+random
+		File filecodeTemp = new File(dir, getnamelimit(fileTemp.getName())
 				+ ".jpg");
 
 		try {
@@ -53,15 +52,17 @@ public class Code {
 		}
 
 		byte[] enby = loadFile2Bytes(fileTemp.getPath());
+		
+		//byte[] imgby=getdraw(enby);
 
 		enby = desCrypto(enby, KEY);
+
+		//enby=putdraw(enby, imgby);
 
 		saveFileByBytes(enby, filecodeTemp.getPath());
 
 		return filecodeTemp.getPath();
 	}
-	
-	
 
 	/*
 	 * 解密文件
@@ -75,10 +76,12 @@ public class Code {
 		}
 
 		File fileTemp = new File(srcPath);
-		File filedecodeTemp = new File(dir, "decode"
-				+ getnamelimit(fileTemp.getName()) + ".jpg");
+		File filedecodeTemp = new File(dir, getnamelimit(fileTemp.getName())
+				+ ".jpg");
 
 		byte[] deby = loadFile2Bytes(fileTemp.getPath());
+
+		//byte[] imgby=getdraw(deby);
 
 		try {
 			deby = decrypt(deby, KEY);
@@ -86,6 +89,8 @@ public class Code {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
+
+		//deby=putdraw(deby, imgby);
 
 		saveFileByBytes(deby, filedecodeTemp.getPath());
 
@@ -203,6 +208,36 @@ public class Code {
 	public String getnamelimit(String filename) {
 		String limitname = filename.substring(0, filename.lastIndexOf("."));
 		return limitname;
+	}
+	
+	public byte[] getdraw(byte[] src){
+		int l = src.length - TOP;
+		byte[] buffer = new byte[l];
+		for (int i = 0; i <l; i++) {
+			buffer[i] = src[i + TOP];
+		}
+		return buffer;
+		
+	}
+	
+	
+    public byte[] putdraw(byte[] src,byte[] imgby){
+    	int l1=src.length;
+    	int l2=imgby.length;
+    	byte[] buffer=new byte[l2+TOP+2];    	
+    	for (int i = 0; i <TOP; i++) {
+    		buffer[i] = src[i];
+		}
+    	for (int i = 0; i <l2; i++) {
+    		buffer[i+TOP] = imgby[i];
+		}
+    	
+    	buffer[l2+TOP]=src[l1-2];
+    	buffer[l2+TOP+1]=src[l1-1];
+    	
+
+    	return buffer;
+		
 	}
 
 }

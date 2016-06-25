@@ -86,7 +86,7 @@ public class SecretActivity extends Activity {
 		public void onClick(View v) {
 			// TODO Auto-generated method stub
 			
-			deletFiles(mCardPath);
+			deletFiles(mCardPath+ File.separator + "DrawEncode");
 			showMsg("É¾³ýÍ¼Æ¬³É¹¦");
 		}
 	}; 
@@ -108,7 +108,7 @@ public class SecretActivity extends Activity {
 							ff.delete();
 								
 						}*/
-						if(end.equals("DES")){
+						if(end.equals("JPG")){
 							ff.delete();
 						}
 					}
