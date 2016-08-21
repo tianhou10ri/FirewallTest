@@ -26,13 +26,13 @@
         android:layout_marginBottom="64dp"
         android:text="加密" />
 
-    <!--<Button
+    <!-- <Button
         android:id="@+id/scan_virus_button"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_above="@+id/main_secret_button"
         android:layout_centerHorizontal="true"
         android:layout_marginBottom="42dp"
-        android:text="查毒" />-->
+        android:text="查毒" /> -->
 
 </RelativeLayout>

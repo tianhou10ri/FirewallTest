@@ -310,20 +310,20 @@ public class TotalDataActivity extends Activity {
 			for (int j = 1; j < 8; j++) {
 				int t =dayx-7+j;
 
-				if (t < 10) {
+				if (t < 9) {
 					xkedu[j - 1] = month + "-0" + t;
-					datastart = year + "-" + month + "-0" + (t-1);
-					datastop = year + "-" + month + "-0" + t;
+					datastart = year + "-" + month + "-0" + t;
+					datastop = year + "-" + month + "-0" + (t+1);
 				} else {
-					if(t==10){
+					if(t==9){
 						xkedu[j - 1] = month + "-" + t;
-						datastart = year + "-" + month + "-0" + (t-1);
-						datastop = year + "-" + month + "-" + t;
+						datastart = year + "-" + month + "-0" + t;
+						datastop = year + "-" + month + "-" + (t+1);
 					}
 					else{
 						xkedu[j - 1] = month + "-" + t;
-						datastart = year + "-" + month + "-" + (t-1);
-						datastop = year + "-" + month + "-" + t;
+						datastart = year + "-" + month + "-" + t;
+						datastop = year + "-" + month + "-" + (t+1);
 					}
 				}
 
