@@ -8,32 +8,58 @@
     android:paddingTop="@dimen/activity_vertical_margin"
     tools:context="com.android.firewalltest.TotalDataActivity" >
 
-    <TextView
-        android:id="@+id/benyueliuliang"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_alignParentLeft="true"
-        android:layout_alignParentTop="true"
-        android:layout_marginTop="102dp"
-        android:text="本月流量" />
+    
 
-    <TextView
-        android:id="@+id/total_data_textView1"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_alignBaseline="@+id/benyueliuliang"
-        android:layout_alignBottom="@+id/benyueliuliang"
-        android:layout_centerHorizontal="true"
-        android:text="Large Text"
-        android:textAppearance="?android:attr/textAppearanceLarge" />
+        <LinearLayout
+            android:id="@+id/linearLayout1"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentTop="true"
+            android:layout_marginTop="10dp"
+            android:orientation="horizontal" >
 
-    <Button
-        android:id="@+id/example_data_button"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_alignLeft="@+id/total_data_textView1"
-        android:layout_below="@+id/total_data_textView1"
-        android:layout_marginTop="130dp"
-        android:text="详细流量" />
+            <TextView
+                android:id="@+id/benyueliuliang"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginLeft="39dp"
+                android:text="本月流量" />
+
+            <TextView
+                android:id="@+id/total_data_textView1"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginLeft="42dp"
+                android:text="Large Text"
+                android:textAppearance="?android:attr/textAppearanceLarge" />
+        </LinearLayout>
+
+        <LinearLayout
+            android:id="@+id/linearLayout2"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_alignParentBottom="true"
+            android:layout_marginTop="10dp"
+            android:orientation="horizontal" >
+
+            <Button
+                android:id="@+id/example_data_button"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_alignParentBottom="true"
+                android:layout_marginBottom="10dp"
+                android:text="详细流量" />
+        </LinearLayout>
+        
+        <LinearLayout
+            android:id="@+id/liuliangzhexian"
+            android:layout_below ="@id/linearLayout1"
+            android:layout_above="@id/linearLayout2"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="10dp"
+            android:orientation="horizontal" >
+        </LinearLayout>
+    
 
 </RelativeLayout>

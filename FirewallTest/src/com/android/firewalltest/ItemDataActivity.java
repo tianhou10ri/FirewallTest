@@ -3,9 +3,6 @@ package com.android.firewalltest;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
-import com.android.firewalltest.Api;
-
-
 import android.app.Activity;
 import android.content.Context;
 import android.content.SharedPreferences;
@@ -43,7 +40,7 @@ public class ItemDataActivity extends Activity {
 	/** special application UID used to indicate "any application" */
 	public static final int SPECIAL_UID_ANY = -10;
 	/** root script filename */
-	private static final String SCRIPT_FILE = "droidwall.sh";
+	private static final String SCRIPT_FILE = "firewall.sh";
 
 	// Preferences
 	public static final String PREFS_NAME = "FireWallPrefs";
@@ -89,7 +86,7 @@ public class ItemDataActivity extends Activity {
 
 				final SharedPreferences prefs = getSharedPreferences(
 						PREFS_NAME, 0);
-				// allowed application names separated by pipe '|' (persisted)
+				//将各个应用的网络连接设置按照Uid存储到SharedPreferences中
 
 				String Uids_gprs = prefs.getString(appid + "gprs", "false");
 				String Uids_wifi = prefs.getString(appid + "wifi", "false");
@@ -142,7 +139,7 @@ public class ItemDataActivity extends Activity {
 		public View getView(int position, View convertView, ViewGroup parent) {
 			final Datalist data = new Datalist();
 			convertView = LayoutInflater.from(context).inflate(
-					R.layout.list_item, null);
+					R.layout.list_app_item, null);
 
 			data.appname = (TextView) convertView
 					.findViewById(R.id.item_name_textView);
@@ -155,7 +152,7 @@ public class ItemDataActivity extends Activity {
 
 			data.appsuid=item.get(position).get("uid").toString();
 			data.appname.setText(item.get(position).get("appsname").toString());
-			data.appdata.setText(item.get(position).get("appsdata").toString());
+			data.appdata.setText(item.get(position).get("appsdata").toString()+"MB");
 
 			data.checkgprs.setChecked(item.get(position).get("app_gprs")
 					.equals("true"));
@@ -225,6 +222,7 @@ public class ItemDataActivity extends Activity {
 			// TODO Auto-generated method stub
 
 			if (!MyApi.hasRootAccess(ItemDataActivity.this, true)) return;
+			MyApi.purgeIptables(ItemDataActivity.this, true);
 			if(MyApi.applyIptablesRules(ItemDataActivity.this, true)){
 				Toast.makeText(ItemDataActivity.this, "Rules applied with success", Toast.LENGTH_SHORT).show();
 			}
