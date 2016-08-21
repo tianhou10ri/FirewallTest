@@ -27,7 +27,7 @@ public class Code {
 
 	String SDPath = Environment.getExternalStorageDirectory().getPath();
 	String KEY = "12345678";
-	final int TOP=623;
+	final int TOP=0;
 
 	/*
 	 * ¼ÓÃÜÎÄ¼ş
